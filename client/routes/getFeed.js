@@ -1,29 +1,19 @@
 import express from "express";
-import jwt from "jsonwebtoken";
 import User from "../models/user.schema.js";
 import Signal from "../models/signal.schema.js"; // Make sure your signal schema file name matches
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post("/", async (req, res) => {
   try {
-    const { token } = req.body;
+    const { userId } = req.body;
 
-    if (!token) {
-      return res.status(400).json({ error: "Token is required" });
-    }
-
-    // Verify token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, JWT_SECRET);
-    } catch (err) {
-      return res.status(401).json({ error: "Invalid or expired token" });
+    if (!userId) {
+      return res.status(400).json({ error: "UserId is required" });
     }
 
     // Get the logged-in user
-    const user = await User.findById(decoded.id).select("subscribedPunters");
+    const user = await User.findById(userId).select("subscribedPunters");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
