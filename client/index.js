@@ -16,6 +16,8 @@ import login from "./routes/login.js";
 import register from "./routes/register.js"
 import subscribe from "./routes/subscribe.js"
 import withdrawal from "./routes/withdrawal.js"
+import changeRole from "./routes/changeRole.js"
+import checkUsername from "./routes/checkUsername.js"
 
 
 const router = Router();
@@ -37,6 +39,8 @@ router.use("/login", login);
 router.use("/register", register);
 router.use("/subscribe", subscribe);
 router.use("/withdrawal", withdrawal);
+router.use("/changeRole", changeRole)
+router.use("/checkUsername", checkUsername)
 
 
 export default router;

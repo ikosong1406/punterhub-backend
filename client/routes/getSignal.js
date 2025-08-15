@@ -4,12 +4,6 @@ import Signal from "../models/signal.schema.js";
 
 const router = express.Router();
 
-/**
- * POST /api/get-signals
- * Body: {
- *   userId: ""
- * }
- */
 router.post("/", async (req, res) => {
   try {
     const { userId } = req.body;

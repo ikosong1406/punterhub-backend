@@ -3,13 +3,13 @@ import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
 const matchSchema = new Schema({
-  team: { type: String, required: true },
-  prediction: { type: String, required: true },
+  team: { type: String },
+  prediction: { type: String },
 });
 
 const signalSchema = new Schema(
   {
-    primaryCategory: { type: String, required: true },
+    primaryCategory: { type: String },
     secondaryCategory: { type: String },
     bettingSite: { type: String },
     bettingCode: { type: String },
@@ -24,7 +24,7 @@ const signalSchema = new Schema(
     takeProfit: { type: Number },
     stopLoss: { type: Number },
     timeFrame: { type: String }, // e.g., "1h", "4h", "1d"
-    status: { type: String, enum: ["pending", "won", "lost", "cancelled"], default: "pending" },
+    status: { type: String, enum: ["active", "won", "lost"], default: "active" },
     thumbsUp: { type: Number, default: 0 },
     thumbsDown: { type: Number, default: 0 },
   },
