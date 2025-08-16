@@ -4,9 +4,9 @@ import User from "../models/user.schema.js";
 const router = express.Router();
 
 // Check if a user is subscribed to a specific punter
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const { userId, punterId } = req.params;
+    const { userId, punterId } = req.body;
 
     // Find user with only subscribedPunters
     const user = await User.findById(userId).select("subscribedPunters");
