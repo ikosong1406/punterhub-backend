@@ -5,36 +5,62 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { userId, username, primaryCategory, secondaryCategory } = req.body;
+    const { userId, username, primaryCategory, secondaryCategory, price } =
+      req.body;
 
     // Validate required fields
-    if (!userId || !username || !primaryCategory || !secondaryCategory) {
-      return res.status(400).json({ 
-        error: "User ID, username, primary category, and secondary category are required" 
+    if (
+      !userId ||
+      !username ||
+      !primaryCategory ||
+      !secondaryCategory ||
+      !price
+    ) {
+      return res.status(400).json({
+        error:
+          "User ID, username, primary category, and secondary category are required",
       });
     }
 
     // Validate primary category
     const validPrimaryCategories = ["sports", "trading"];
     if (!validPrimaryCategories.includes(primaryCategory)) {
-      return res.status(400).json({ 
-        error: "Invalid primary category. Must be either 'sports' or 'trading'" 
+      return res.status(400).json({
+        error: "Invalid primary category. Must be either 'sports' or 'trading'",
       });
     }
 
     // Validate secondary category based on primary category
-    const validSportsSubcategories = ["football", "basketball", "tennis", "cricket", "baseball"];
-    const validTradingSubcategories = ["forex", "crypto", "stocks", "commodities", "indices"];
-    
-    if (primaryCategory === "sports" && !validSportsSubcategories.includes(secondaryCategory)) {
-      return res.status(400).json({ 
-        error: "Invalid sports subcategory" 
+    const validSportsSubcategories = [
+      "football",
+      "basketball",
+      "tennis",
+      "cricket",
+      "baseball",
+    ];
+    const validTradingSubcategories = [
+      "forex",
+      "crypto",
+      "stocks",
+      "commodities",
+      "indices",
+    ];
+
+    if (
+      primaryCategory === "sports" &&
+      !validSportsSubcategories.includes(secondaryCategory)
+    ) {
+      return res.status(400).json({
+        error: "Invalid sports subcategory",
       });
     }
-    
-    if (primaryCategory === "trading" && !validTradingSubcategories.includes(secondaryCategory)) {
-      return res.status(400).json({ 
-        error: "Invalid trading subcategory" 
+
+    if (
+      primaryCategory === "trading" &&
+      !validTradingSubcategories.includes(secondaryCategory)
+    ) {
+      return res.status(400).json({
+        error: "Invalid trading subcategory",
       });
     }
 
@@ -50,6 +76,7 @@ router.post("/", async (req, res) => {
     user.username = username;
     user.primaryCategory = primaryCategory;
     user.secondaryCategory = secondaryCategory;
+    user.price = price;
 
     await user.save();
 
@@ -59,9 +86,9 @@ router.post("/", async (req, res) => {
     });
   } catch (error) {
     console.error("Error in becomePunter route:", error);
-    res.status(500).json({ 
-      error: "Server error", 
-      details: error.message 
+    res.status(500).json({
+      error: "Server error",
+      details: error.message,
     });
   }
 });

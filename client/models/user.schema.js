@@ -29,10 +29,7 @@ const userSchema = new Schema(
     win: { type: Number, default: 0 },
     loss: { type: Number, default: 0 },
     rating: { type: Number, default: 0 },
-    price: {
-      weekly: { type: Number, default: 0 },
-      monthly: { type: Number, default: 0 },
-    },
+    price: { type: Number, default: 0 },
     bio: { type: String },
     promoCode: { type: String },
     signals: [{ type: Schema.Types.ObjectId, ref: "Signal" }],

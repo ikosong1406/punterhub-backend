@@ -4,12 +4,6 @@ import Notification from "../models/notification.schema.js";
 
 const router = express.Router();
 
-/**
- * POST /api/get-notifications
- * Body: {
- *   userId: ""
- * }
- */
 router.post("/", async (req, res) => {
   try {
     const { userId } = req.body;
