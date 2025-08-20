@@ -18,6 +18,8 @@ import subscribe from "./routes/subscribe.js"
 import withdrawal from "./routes/withdrawal.js"
 import changeRole from "./routes/changeRole.js"
 import checkUsername from "./routes/checkUsername.js"
+import editSignal from "./routes/editSignal.js"
+import deleteSignal from "./routes/deleteSignal.js"
 
 
 const router = Router();
@@ -41,6 +43,7 @@ router.use("/subscribe", subscribe);
 router.use("/withdrawal", withdrawal);
 router.use("/changeRole", changeRole)
 router.use("/checkUsername", checkUsername)
-
+router.use("/editSignal", editSignal)
+router.use("/deleteSignal", deleteSignal)
 
 export default router;
