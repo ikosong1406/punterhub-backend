@@ -5,67 +5,75 @@ const router = express.Router();
 
 // Subscribe to a punter
 router.post("/", async (req, res) => {
-  try {
-    const { userId, punterId, planType } = req.body;
+  try {
+    const { userId, punterId } = req.body;
 
-    if (!userId || !punterId || !planType) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+    if (!userId || !punterId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
-    if (!["weekly", "monthly"].includes(planType)) {
-      return res.status(400).json({ message: "Invalid plan type" });
-    }
+    // Find both users
+    const user = await User.findById(userId);
+    const punter = await User.findById(punterId);
 
-    // Calculate subscription dates
-    const startDate = new Date();
-    const endDate = new Date(startDate);
+    if (!user || !punter) {
+      return res.status(404).json({ message: "User or punter not found" });
+    }
 
-    if (planType === "weekly") {
-      endDate.setDate(endDate.getDate() + 7);
-    } else if (planType === "monthly") {
-      endDate.setMonth(endDate.getMonth() + 1);
-    }
+    // Check if already subscribed
+    const alreadySubscribed = user.subscribedPunters.some(
+      sub => sub.punterId.toString() === punterId
+    );
 
-    // Find both users
-    const user = await User.findById(userId);
-    const punter = await User.findById(punterId);
+    if (alreadySubscribed) {
+      return res.status(400).json({ message: "Already subscribed to this punter" });
+    }
 
-    if (!user || !punter) {
-      return res.status(404).json({ message: "User or punter not found" });
-    }
+    // Get the punter's subscription price
+    const subscriptionPrice = punter.price; 
 
-    // Check if already subscribed
-    const alreadySubscribed = user.subscribedPunters.some(
-      sub => sub.punterId.toString() === punterId
-    );
+    if (!subscriptionPrice || subscriptionPrice <= 0) {
+      return res.status(400).json({ message: "Punter's subscription price not set or invalid" });
+    }
+    
+    // Check if user has sufficient balance
+    if (user.balance < subscriptionPrice) {
+      return res.status(402).json({ message: "Insufficient balance" });
+    }
+    
+    // Deduct subscription price from user's balance
+    user.balance -= subscriptionPrice;
+    
+    // Add subscription price to punter's balance
+    punter.balance += subscriptionPrice;
 
-    if (alreadySubscribed) {
-      return res.status(400).json({ message: "Already subscribed to this punter" });
-    }
+    // Calculate subscription dates (weekly only)
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 7);
 
-    // Add subscription to the subscriber
-    user.subscribedPunters.push({
-      punterId,
-      planType,
-      startDate,
-      endDate
-    });
+    // Add subscription to the subscriber
+    user.subscribedPunters.push({
+      punterId,
+      startDate,
+      endDate
+    });
+    
+    // Add subscriber to the punter
+    punter.subscribers.push(userId);
 
-    // Add subscriber to the punter
-    punter.subscribers.push(userId);
+    await user.save();
+    await punter.save();
 
-    await user.save();
-    await punter.save();
+    res.status(200).json({
+      message: "Subscription successful",
+      subscription: { punterId, startDate, endDate }
+    });
 
-    res.status(200).json({
-      message: "Subscription successful",
-      subscription: { punterId, planType, startDate, endDate }
-    });
-
-  } catch (error) {
-    console.error("Error subscribing:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
+  } catch (error) {
+    console.error("Error subscribing:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 });
 
 export default router;

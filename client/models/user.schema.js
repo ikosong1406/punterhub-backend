@@ -4,8 +4,8 @@ const { Schema, model } = mongoose;
 
 const subscribedPunterSchema = new Schema(
   {
-     punterId: { type: Schema.Types.ObjectId, ref: "User" },
-    planType: { type: String, enum: ["weekly", "monthly"] },
+    punterId: { type: Schema.Types.ObjectId, ref: "User" },
+    planType: { type: String, enum: ["weekly", "monthly"], default: "weekly" },
     startDate: { type: Date, default: Date.now },
     endDate: { type: Date },
   },
@@ -32,13 +32,14 @@ const userSchema = new Schema(
     price: { type: Number, default: 0 },
     bio: { type: String },
     promoCode: { type: String },
+    pinnedSignals: [{ type: Schema.Types.ObjectId, ref: "Signal" }],
     signals: [{ type: Schema.Types.ObjectId, ref: "Signal" }],
     subscribers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     isVerified: { type: Boolean, default: false },
     isEmailVerified: { type: Boolean, default: false },
     balance: { type: Number, default: 0 },
     transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
-    
+
     // Updated: Store subscription type with punter ID
     subscribedPunters: [subscribedPunterSchema],
 
