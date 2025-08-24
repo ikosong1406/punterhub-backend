@@ -28,6 +28,10 @@ router.post("/", async (req, res) => {
       phoneNumber,
       password,
       promoCode,
+      username,
+      primaryCategory,
+      secondaryCategory,
+      price,
     } = req.body;
 
     if (!email) {
@@ -86,6 +90,12 @@ router.post("/", async (req, res) => {
       password: hashedPassword,
       promoCode: newPromoCode,
       balance: 0,
+      isPunter: true,
+      role: "punter",
+      username: username,
+      primaryCategory: primaryCategory,
+      secondaryCategory: secondaryCategory,
+      price: price,
     });
 
     await newUser.save();

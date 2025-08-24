@@ -27,6 +27,7 @@ const signalSchema = new Schema(
     status: { type: String, enum: ["active", "won", "lost"], default: "active" },
     thumbsUp: { type: Number, default: 0 },
     thumbsDown: { type: Number, default: 0 },
+    isPinned: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

@@ -20,7 +20,8 @@ import changeRole from "./routes/changeRole.js"
 import checkUsername from "./routes/checkUsername.js"
 import editSignal from "./routes/editSignal.js"
 import deleteSignal from "./routes/deleteSignal.js"
-
+import pinSignal from "./routes/pinSignal.js"
+import punterRegister from "./routes/punterRegister.js"
 
 const router = Router();
 
@@ -45,5 +46,7 @@ router.use("/changeRole", changeRole)
 router.use("/checkUsername", checkUsername)
 router.use("/editSignal", editSignal)
 router.use("/deleteSignal", deleteSignal)
+router.use("/pinSignal", pinSignal)
+router.use("/punterRegister", punterRegister)
 
 export default router;
