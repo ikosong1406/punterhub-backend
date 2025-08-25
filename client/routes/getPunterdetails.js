@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/user.schema.js";
+import Signal from "../models/signal.schema.js"; // Import the Signal model
 
 const router = express.Router();
 
@@ -18,9 +19,17 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Punter not found" });
     }
 
+    // Find all signals where the _id is in the punter's signals array
+    const signals = await Signal.find({
+      _id: { $in: punter.signals },
+    });
+
     res.status(200).json({
       status: "ok",
-      data: punter,
+      data: {
+        punter: punter,
+        signals: signals,
+      },
     });
   } catch (error) {
     res.status(500).json({ error: "Server error", details: error.message });

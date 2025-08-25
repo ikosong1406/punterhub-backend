@@ -10,8 +10,7 @@ router.get("/", async (req, res) => {
       {
         _id: 1,
         profilePicture: 1,
-        firstname: 1,
-        lastname: 1,
+        username: 1,
         primaryCategory: 1,
         secondaryCategory: 1,
         rating: 1,
