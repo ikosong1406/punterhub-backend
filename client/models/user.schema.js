@@ -12,6 +12,15 @@ const subscribedPunterSchema = new Schema(
   { _id: false }
 );
 
+// New Schema for a single pricing plan
+const pricingSchema = new Schema(
+  {
+    price: { type: Number },
+    offers: [{ type: String }],
+  },
+  { _id: false }
+);
+
 const userSchema = new Schema(
   {
     profilePicture: { type: String }, // URL to image
@@ -23,25 +32,30 @@ const userSchema = new Schema(
     password: { type: String },
     role: { type: String, enum: ["user", "punter"], default: "user" },
     isPunter: { type: Boolean, default: false },
+    isPromoted: { type: Boolean, default: false },
+    isMessageable: { type: Boolean, default: false },
     primaryCategory: { type: String },
     secondaryCategory: { type: String },
     username: { type: String, unique: true },
-    win: { type: Number, default: 0 },
-    loss: { type: Number, default: 0 },
-    rating: { type: Number, default: 0 },
-    price: { type: Number, default: 0 },
     bio: { type: String },
     promoCode: { type: String },
-    pinnedSignals: [{ type: Schema.Types.ObjectId, ref: "Signal" }],
     signals: [{ type: Schema.Types.ObjectId, ref: "Signal" }],
     subscribers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     isVerified: { type: Boolean, default: false },
     isEmailVerified: { type: Boolean, default: false },
     balance: { type: Number, default: 0 },
     transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
+    messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
 
     // Updated: Store subscription type with punter ID
     subscribedPunters: [subscribedPunterSchema],
+
+    // New field to store pricing plans
+    pricingPlans: {
+      silver: pricingSchema,
+      gold: pricingSchema,
+      diamond: pricingSchema,
+    },
 
     bankdetails: {
       accountname: { type: String },

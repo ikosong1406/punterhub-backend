@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { userId, username, primaryCategory, secondaryCategory, price } =
+    const { userId, username, primaryCategory, secondaryCategory } =
       req.body;
 
     // Validate required fields
@@ -13,8 +13,7 @@ router.post("/", async (req, res) => {
       !userId ||
       !username ||
       !primaryCategory ||
-      !secondaryCategory ||
-      !price
+      !secondaryCategory
     ) {
       return res.status(400).json({
         error:
@@ -76,8 +75,6 @@ router.post("/", async (req, res) => {
     user.username = username;
     user.primaryCategory = primaryCategory;
     user.secondaryCategory = secondaryCategory;
-    user.price = price;
-
     await user.save();
 
     res.status(200).json({

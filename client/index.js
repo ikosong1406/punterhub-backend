@@ -22,6 +22,9 @@ import editSignal from "./routes/editSignal.js"
 import deleteSignal from "./routes/deleteSignal.js"
 import pinSignal from "./routes/pinSignal.js"
 import punterRegister from "./routes/punterRegister.js"
+import leaderboard from "./routes/leaderboard.js"
+import pricing from "./routes/pricing.js"
+import winloss from "./routes/winloss.js"
 
 const router = Router();
 
@@ -48,5 +51,8 @@ router.use("/editSignal", editSignal)
 router.use("/deleteSignal", deleteSignal)
 router.use("/pinSignal", pinSignal)
 router.use("/punterRegister", punterRegister)
+router.use("/leaderboard", leaderboard)
+router.use("/pricing", pricing)
+router.use("/winloss", winloss)
 
 export default router;

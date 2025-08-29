@@ -3,53 +3,45 @@ import User from "../models/user.schema.js";
 
 const router = express.Router();
 
-/**
- * PUT /api/edit-profile
- * Body: {
- *   userId: "",
- *   firstname?: "",
- *   lastname?: "",
- *   email?: "",
- *   phoneCode?: "",
- *   phoneNumber?: "",
- *   profilePicture?: "",
- *   primaryCategory?: "",
- *   secondaryCategory?: ""
- * }
- */
-router.put("/", async (req, res) => {
-  try {
-    const { userId, ...updateFields } = req.body;
+router.post("/", async (req, res) => {
+    const { userId, username, phonenumber, isMessageable } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ error: "User ID is required" });
+    // Basic Validation
+    if (!username || !phonenumber || isMessageable === undefined) {
+        return res.status(400).json({ message: 'Missing required profile fields.' });
     }
 
-    // Remove fields that are undefined or empty string
-    Object.keys(updateFields).forEach((key) => {
-      if (updateFields[key] === undefined || updateFields[key] === "") {
-        delete updateFields[key];
-      }
-    });
+    try {
+        // Find the user by the ID attached from the protect middleware
+        const user = await User.findById(userId);
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $set: updateFields },
-      { new: true } // return updated document
-    ).select("-password -confirmPassword"); // exclude sensitive fields
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
 
-    if (!updatedUser) {
-      return res.status(404).json({ error: "User not found" });
+        // Update the user's fields
+        user.username = username;
+        user.phonenumber = phonenumber;
+        user.isMessageable = isMessageable;
+
+        // Save the updated user document
+        const updatedUser = await user.save();
+
+        // Return a successful response with the updated user data (optional)
+        res.status(200).json({
+            message: 'Profile updated successfully!',
+            updatedUser: {
+                _id: updatedUser._id,
+                username: updatedUser.username,
+                phonenumber: updatedUser.phonenumber,
+                isMessageable: updatedUser.isMessageable,
+            }
+        });
+
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).json({ message: 'Server error. Could not update profile.' });
     }
-
-    res.status(200).json({
-      status: "ok",
-      message: "Profile updated successfully",
-      user: updatedUser,
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Server error", details: error.message });
-  }
 });
 
 export default router;
