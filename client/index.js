@@ -25,6 +25,9 @@ import punterRegister from "./routes/punterRegister.js"
 import leaderboard from "./routes/leaderboard.js"
 import pricing from "./routes/pricing.js"
 import winloss from "./routes/winloss.js"
+import reset from "./routes/reset.js"
+import verifyCode from "./routes/verifyCode.js"
+import newpassword from "./routes/newpassword.js"
 
 const router = Router();
 
@@ -54,5 +57,8 @@ router.use("/punterRegister", punterRegister)
 router.use("/leaderboard", leaderboard)
 router.use("/pricing", pricing)
 router.use("/winloss", winloss)
+router.use("/reset", reset)
+router.use("/verifyCode", verifyCode)
+router.use("/newpassword", newpassword)
 
 export default router;

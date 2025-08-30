@@ -46,17 +46,20 @@ const userSchema = new Schema(
     balance: { type: Number, default: 0 },
     transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
     messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
-
-    // Updated: Store subscription type with punter ID
     subscribedPunters: [subscribedPunterSchema],
-
-    // New field to store pricing plans
     pricingPlans: {
       silver: pricingSchema,
       gold: pricingSchema,
       diamond: pricingSchema,
     },
-
+    resetCode: {
+      type: Number,
+      required: false,
+    },
+    resetCodeExpires: {
+      type: Date,
+      required: false,
+    },
     bankdetails: {
       accountname: { type: String },
       accountnumber: { type: String },

@@ -30,8 +30,7 @@ router.post("/", async (req, res) => {
       promoCode,
       username,
       primaryCategory,
-      secondaryCategory,
-      price,
+      secondaryCategory
     } = req.body;
 
     if (!email) {
@@ -94,8 +93,7 @@ router.post("/", async (req, res) => {
       role: "punter",
       username: username,
       primaryCategory: primaryCategory,
-      secondaryCategory: secondaryCategory,
-      price: price,
+      secondaryCategory: secondaryCategory
     });
 
     await newUser.save();
