@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { email, newPassword } = req.body;
+    const { email, password } = req.body;
 
     // Find user by email
     const user = await User.findOne({ email });
@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
 
     // Hash the new password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Update the user's password and clear the reset code fields
     user.password = hashedPassword;
