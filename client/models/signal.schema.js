@@ -24,7 +24,7 @@ const signalSchema = new Schema(
     takeProfit: { type: Number },
     stopLoss: { type: Number },
     timeFrame: { type: String }, // e.g., "1h", "4h", "1d"
-    status: { type: String, enum: ["active", "won", "lost"], default: "active" },
+    status: { type: String, enum: ["active", "win", "loss"], default: "active" },
     thumbsUp: { type: Number, default: 0 },
     thumbsDown: { type: Number, default: 0 },
     isPinned: { type: Boolean, default: false }

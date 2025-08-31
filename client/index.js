@@ -28,6 +28,8 @@ import winloss from "./routes/winloss.js"
 import reset from "./routes/reset.js"
 import verifyCode from "./routes/verifyCode.js"
 import newpassword from "./routes/newpassword.js"
+import getReaction from "./routes/getReaction.js"
+import updateReaction from "./routes/updateReaction.js"
 
 const router = Router();
 
@@ -60,5 +62,7 @@ router.use("/winloss", winloss)
 router.use("/reset", reset)
 router.use("/verifyCode", verifyCode)
 router.use("/newpassword", newpassword)
+router.use("/getReaction", getReaction)
+router.use("/updateReaction", updateReaction)
 
 export default router;
