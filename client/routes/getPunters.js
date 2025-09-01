@@ -9,13 +9,9 @@ router.get("/", async (req, res) => {
       { isPunter: true }, // Filter for punters
       {
         _id: 1,
-        profilePicture: 1,
         username: 1,
         primaryCategory: 1,
         secondaryCategory: 1,
-        rating: 1,
-        win: 1,
-        loss: 1,
         price: 1,
       }
     );

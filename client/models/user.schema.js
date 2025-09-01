@@ -35,7 +35,7 @@ const userSchema = new Schema(
     isEmailVerified: { type: Boolean, default: false },
     balance: { type: Number, default: 0 },
     transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
-    messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
+    chat: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
     subscribedPunters: [
       {
         punterId: {

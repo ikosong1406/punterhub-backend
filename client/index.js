@@ -30,6 +30,9 @@ import verifyCode from "./routes/verifyCode.js"
 import newpassword from "./routes/newpassword.js"
 import getReaction from "./routes/getReaction.js"
 import updateReaction from "./routes/updateReaction.js"
+import getMessages from "./routes/getMessages.js"
+import createMessage from "./routes/createMessage.js"
+import sendMessage from "./routes/sendMessage.js"
 
 const router = Router();
 
@@ -64,5 +67,8 @@ router.use("/verifyCode", verifyCode)
 router.use("/newpassword", newpassword)
 router.use("/getReaction", getReaction)
 router.use("/updateReaction", updateReaction)
+router.use("/getMessages", getMessages)
+router.use("/createMessage", createMessage)
+router.use("/sendMessage", sendMessage)
 
 export default router;
