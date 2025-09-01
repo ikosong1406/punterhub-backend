@@ -1,79 +1,106 @@
 import express from "express";
 import User from "../models/user.schema.js";
+import Transaction from "../models/transaction.schema.js";
+import Notification from "../models/notification.schema.js";
 
 const router = express.Router();
 
-// Subscribe to a punter
 router.post("/", async (req, res) => {
-  try {
-    const { userId, punterId } = req.body;
+  try {
+    const { userId, punterId, plan, price } = req.body;
 
-    if (!userId || !punterId) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
+    const user = await User.findById(userId);
+    const punter = await User.findById(punterId);
 
-    // Find both users
-    const user = await User.findById(userId);
-    const punter = await User.findById(punterId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    if (!punter) {
+      return res.status(404).json({ message: "Punter not found." });
+    }
 
-    if (!user || !punter) {
-      return res.status(404).json({ message: "User or punter not found" });
-    }
+    // Check if the user is already subscribed
+    const isAlreadySubscribed = user.subscribedPunters.some(
+      (sub) => sub.punterId.toString() === punterId
+    );
 
-    // Check if already subscribed
-    const alreadySubscribed = user.subscribedPunters.some(
-      sub => sub.punterId.toString() === punterId
-    );
+    if (isAlreadySubscribed) {
+      return res.status(400).json({ message: "You are already subscribed to this punter." });
+    }
 
-    if (alreadySubscribed) {
-      return res.status(400).json({ message: "Already subscribed to this punter" });
-    }
+    // Check if the user has enough balance
+    if (user.balance < price) {
+      return res.status(402).json({ message: "Insufficient balance to subscribe." });
+    }
 
-    // Get the punter's subscription price
-    const subscriptionPrice = punter.price; 
+    // Calculate the punter's share (80% of the price)
+    const punterEarnings = price * 0.80;
 
-    if (!subscriptionPrice || subscriptionPrice <= 0) {
-      return res.status(400).json({ message: "Punter's subscription price not set or invalid" });
-    }
+    // Deduct the full price from the user's balance
+    user.balance -= price;
+
+    // Add the punter's earnings to their balance
+    punter.balance += punterEarnings;
+
+    // Create a transaction for the user's payment
+    const userTransaction = await Transaction.create({
+      user: userId,
+      type: "subscription",
+      amount: -price, // Negative amount to represent a debit
+      status: "completed",
+      description: `Subscription to ${punter.username} (${plan} plan)`,
+    });
     
-    // Check if user has sufficient balance
-    if (user.balance < subscriptionPrice) {
-      return res.status(402).json({ message: "Insufficient balance" });
-    }
+    // Create a transaction for the punter's earnings
+    const punterTransaction = await Transaction.create({
+      user: punterId,
+      type: "payment",
+      amount: punterEarnings,
+      status: "completed",
+      description: `Earnings from new subscriber: ${user.username}`,
+    });
+
+    // Create a notification for the punter
+    const notification = await Notification.create({
+      title: "New Subscriber",
+      description: `${user.username} has subscribed to your signals.`,
+      type: "success",
+      amount: punterEarnings,
+    });
+
+    // Add new subscription to the user's subscribedPunters array
+    user.subscribedPunters.push({
+      punterId,
+      plan,
+      price,
+      subscriptionDate: new Date(),
+    });
     
-    // Deduct subscription price from user's balance
-    user.balance -= subscriptionPrice;
-    
-    // Add subscription price to punter's balance
-    punter.balance += subscriptionPrice;
+    // Add the user's ID to the punter's subscribers array
+    punter.subscribers.push(userId);
 
-    // Calculate subscription dates (weekly only)
-    const startDate = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 7);
+    // Add transaction IDs to both user and punter
+    user.transactions.push(userTransaction._id);
+    punter.transactions.push(punterTransaction._id);
 
-    // Add subscription to the subscriber
-    user.subscribedPunters.push({
-      punterId,
-      startDate,
-      endDate
-    });
-    
-    // Add subscriber to the punter
-    punter.subscribers.push(userId);
+    // Add the notification ID to the punter's notifications array
+    punter.notifications.push(notification._id);
 
-    await user.save();
-    await punter.save();
+    // Save changes to both documents
+    await user.save();
+    await punter.save();
 
-    res.status(200).json({
-      message: "Subscription successful",
-      subscription: { punterId, startDate, endDate }
-    });
-
-  } catch (error) {
-    console.error("Error subscribing:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
+    res.status(200).json({
+      message: "Subscription successful! Your balance has been updated.",
+      subscription: user.subscribedPunters.find(
+        (sub) => sub.punterId.toString() === punterId
+      ),
+      newBalance: user.balance,
+    });
+  } catch (error) {
+    console.error("Error during subscription:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
 });
 
 export default router;

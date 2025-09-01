@@ -2,16 +2,6 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const subscribedPunterSchema = new Schema(
-  {
-    punterId: { type: Schema.Types.ObjectId, ref: "User" },
-    planType: { type: String, enum: ["weekly", "monthly"], default: "weekly" },
-    startDate: { type: Date, default: Date.now },
-    endDate: { type: Date },
-  },
-  { _id: false }
-);
-
 // New Schema for a single pricing plan
 const pricingSchema = new Schema(
   {
@@ -46,7 +36,20 @@ const userSchema = new Schema(
     balance: { type: Number, default: 0 },
     transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
     messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
-    subscribedPunters: [subscribedPunterSchema],
+    subscribedPunters: [
+      {
+        punterId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        plan: String,
+        price: Number,
+        subscriptionDate: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     pricingPlans: {
       silver: pricingSchema,
       gold: pricingSchema,
