@@ -33,6 +33,7 @@ import updateReaction from "./routes/updateReaction.js"
 import getMessages from "./routes/getMessages.js"
 import createMessage from "./routes/createMessage.js"
 import sendMessage from "./routes/sendMessage.js"
+import getMessagedetails from "./routes/getMessagedetails.js"
 
 const router = Router();
 
@@ -70,5 +71,6 @@ router.use("/updateReaction", updateReaction)
 router.use("/getMessages", getMessages)
 router.use("/createMessage", createMessage)
 router.use("/sendMessage", sendMessage)
+router.use("/getMessagedetails", getMessagedetails)
 
 export default router;
