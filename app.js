@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import http from "http"; // Add this import
 import client from "./client/index.js"
+import admin from "./admin/index.js"
 
 const app = express();
 app.use(express.json());
@@ -35,6 +36,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/client", client);
+app.use("/admin", admin);
 
 // Start server
 server.listen(PORT, () => {
