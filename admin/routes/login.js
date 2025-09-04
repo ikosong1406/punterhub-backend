@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
     const user = await Admin.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ error: "Driver doesn't exist" });
+      return res.status(404).json({ error: "Admin doesn't exist" });
     }
 
     // Validate password
