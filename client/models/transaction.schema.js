@@ -23,7 +23,9 @@ const transactionSchema = new Schema(
     description: { type: String },
     details: {
       type: new Schema({
+        userName: { type: String },
         bankCode: { type: String },
+        bankName: { type: String },
         accountNumber: { type: String },
         accountName: { type: String },
       }, { _id: false }),

@@ -6,10 +6,10 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const { userId, amount, bankCode, accountNumber, accountName } = req.body;
+    const { userId, amount, userName, bankCode, bankName, accountNumber, accountName } = req.body;
 
-    if (!userId || !amount || !bankCode || !accountNumber || !accountName) {
-      return res.status(400).json({ error: "User ID, amount, bank details, and account name are required" });
+    if (!userId || !amount || !userName || !bankCode || !bankName || !accountNumber || !accountName) {
+      return res.status(400).json({ error: "User ID, amount, user name, bank code, bank name, account number, and account name are required" });
     }
 
     if (amount <= 0) {
@@ -33,7 +33,9 @@ router.post("/", async (req, res) => {
       amount,
       status: "pending",
       details: {
+        userName,
         bankCode,
+        bankName,
         accountNumber,
         accountName,
       },
