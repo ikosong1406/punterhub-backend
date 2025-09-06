@@ -34,6 +34,7 @@ const userSchema = new Schema(
     isVerified: { type: Boolean, default: false },
     isEmailVerified: { type: Boolean, default: false },
     balance: { type: Number, default: 0 },
+    promoBalance: { type: Number, default: 0 },
     transactions: [{ type: Schema.Types.ObjectId, ref: "Transaction" }],
     chat: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
     subscribedPunters: [

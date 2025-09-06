@@ -94,7 +94,7 @@ router.post("/", async (req, res) => {
     if (promoCode) {
       const referrer = await User.findOne({ promoCode });
       if (referrer) {
-        referrer.balance += BONUS_AMOUNT;
+        referrer.promoBalance += BONUS_AMOUNT;
         await referrer.save();
       }
     }
