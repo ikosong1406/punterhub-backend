@@ -28,16 +28,34 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "You are already subscribed to this punter." });
     }
 
-    // Check if the user has enough balance
-    if (user.balance < price) {
+    // Calculate total available balance
+    const totalBalance = user.balance + user.promoBalance;
+
+    // Check if the user has enough combined balance
+    if (totalBalance < price) {
       return res.status(402).json({ message: "Insufficient balance to subscribe." });
     }
 
+    // --- New Payment Logic ---
+    let remainingPrice = price;
+    
+    // Deduct from promoBalance first
+    if (user.promoBalance >= remainingPrice) {
+      user.promoBalance -= remainingPrice;
+      remainingPrice = 0;
+    } else {
+      remainingPrice -= user.promoBalance;
+      user.promoBalance = 0;
+    }
+    
+    // Deduct remaining from main balance
+    if (remainingPrice > 0) {
+      user.balance -= remainingPrice;
+    }
+    // --- End of New Payment Logic ---
+
     // Calculate the punter's share (80% of the price)
     const punterEarnings = price * 0.80;
-
-    // Deduct the full price from the user's balance
-    user.balance -= price;
 
     // Add the punter's earnings to their balance
     punter.balance += punterEarnings;
@@ -96,6 +114,7 @@ router.post("/", async (req, res) => {
         (sub) => sub.punterId.toString() === punterId
       ),
       newBalance: user.balance,
+      newPromoBalance: user.promoBalance,
     });
   } catch (error) {
     console.error("Error during subscription:", error);
