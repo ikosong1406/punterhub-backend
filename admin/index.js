@@ -7,6 +7,7 @@ import getAdmin from "./routes/getAdmins.js";
 import getSignal from "./routes/getSignal.js";
 import getTransactions from "./routes/getTransactions.js";
 import transactionStatus from "./routes/transactionStatus.js"
+import getIdentification from "./routes/getIdentifications.js"
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/getAdmins", getAdmin);
 router.use("/getSignals", getSignal);
 router.use("/getTransactions", getTransactions);
 router.use("/transactionStatus", transactionStatus);
+router.use("/getIdentifications", getIdentification);
 
 export default router;

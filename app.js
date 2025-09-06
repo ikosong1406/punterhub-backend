@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
+import path from "path";
 import mongoose from "mongoose";
 import cors from "cors";
 import http from "http"; // Add this import
@@ -37,6 +38,8 @@ app.get("/", (_req, res) => {
 
 app.use("/client", client);
 app.use("/admin", admin);
+app.use("/upload", express.static(path.join(process.cwd(), "public_html", "upload")));
+
 
 // Start server
 server.listen(PORT, () => {
