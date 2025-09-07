@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
         primaryCategory: 1,
         secondaryCategory: 1,
         price: 1,
+        isVerified: 1,
       }
     );
 
