@@ -11,6 +11,9 @@ const IdentificationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  idType: {
+    type: String,
+  },
   idPhotos: {
     front: { type: String, required: true }, // URL of front photo
     back: { type: String }, // optional
