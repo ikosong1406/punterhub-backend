@@ -10,7 +10,7 @@ import { welcomeTemplate } from "../templates/welcome.js"; // Your HTML email te
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET;
-const BONUS_AMOUNT = 1; // Amount given when someone's promo code is used
+const BONUS_AMOUNT = 0.5; // Amount given when someone's promo code is used
 
 // Helper to generate unique promo codes
 const generatePromoCode = (firstname) => {
