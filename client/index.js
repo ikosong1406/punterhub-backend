@@ -36,6 +36,8 @@ import sendMessage from "./routes/sendMessage.js"
 import getMessagedetails from "./routes/getMessagedetails.js"
 import upload from "./routes/upload.js"
 import resolve from "./routes/resolve.js"
+import getTip from "./routes/getTip.js"
+import comment from "./routes/comment.js"
 
 const router = Router();
 
@@ -76,5 +78,7 @@ router.use("/sendMessage", sendMessage)
 router.use("/getMessagedetails", getMessagedetails)
 router.use("/upload", upload)
 router.use("/resolve", resolve)
+router.use("/getTip", getTip)
+router.use("/comment", comment)
 
 export default router;

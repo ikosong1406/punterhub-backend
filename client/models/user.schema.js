@@ -26,7 +26,7 @@ const userSchema = new Schema(
     isMessageable: { type: Boolean, default: false },
     primaryCategory: { type: String },
     secondaryCategory: { type: String },
-    username: { type: String, unique: true },
+    username: { type: String },
     bio: { type: String },
     promoCode: { type: String },
     signals: [{ type: Schema.Types.ObjectId, ref: "Signal" }],
