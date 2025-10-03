@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
       user: userId,
       type: "deposit",
       amount,
-      status: "completed", // Set status to completed as per your request
+      status: "success", // Set status to success as per your request
       date: new Date()
     });
 
