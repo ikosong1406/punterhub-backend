@@ -10,6 +10,7 @@ router.post("/", async (req, res) => {
       userId, // Now expecting userId from the request body
       primaryCategory,
       secondaryCategory,
+      tipType,
       bettingSite,
       bettingCode,
       startTime,
@@ -40,6 +41,7 @@ router.post("/", async (req, res) => {
     const newSignal = new Signal({
       primaryCategory,
       secondaryCategory,
+      tipType,
       bettingSite,
       bettingCode,
       startTime,
