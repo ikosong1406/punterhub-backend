@@ -3,14 +3,17 @@ dotenv.config();
 import express from "express";
 import User from "../models/user.schema.js";
 import Transaction from "../models/transaction.schema.js";
-import Paystack from "paystack-node"; // Import the Paystack library (assuming paystack-node)
+import Paystack from "paystack-node";
 
 // Initialize Paystack with your Secret Key
 // Make sure process.env.PAYSTACK_SECRET_KEY is loaded from your .env file
-const paystack = new Paystack(process.env.PAYSTACK_SECRET_KEY, "development"); // Use "live" for production
+const paystack = new Paystack(process.env.PAYSTACK_SECRET_KEY, "live"); // Use "live" for production
 
 const router = express.Router();
 
+/**
+ * Creates a Paystack Transfer Recipient.
+ */
 async function createPaystackRecipient({
   accountName,
   accountNumber,
@@ -23,7 +26,7 @@ async function createPaystackRecipient({
       name: accountName,
       account_number: accountNumber,
       bank_code: bankCode,
-      currency: "NGN", // Assuming NGN, change if necessary
+      currency: "NGN",
       description: `Withdrawal for user ${userName}`,
     };
 
@@ -32,22 +35,23 @@ async function createPaystackRecipient({
     if (response.status && response.data) {
       return response.data; // This data contains the recipient_code
     } else {
-      throw new Error(
+      throw new new Error(
         response.message || "Failed to create Paystack recipient."
       );
     }
   } catch (error) {
     console.error("Paystack Recipient Creation Error:", error);
-    throw new Error(`Paystack Recipient Creation Failed: ${error.message}`);
+    throw new new Error(`Paystack Recipient Creation Failed: ${error.message}`);
   }
 }
 
 /**
  * Initiates the actual fund transfer using the recipient code.
+ * NOTE: The 'amount' parameter must be the value in NGN (Naira).
  */
 async function initiatePaystackTransfer({ recipientCode, amount, reason }) {
   try {
-    // Paystack amount must be in Kobo, so multiply by 100
+    // Paystack amount must be in Kobo, so multiply the Naira amount by 100
     const amountInKobo = amount * 100;
 
     const transferData = {
@@ -62,69 +66,76 @@ async function initiatePaystackTransfer({ recipientCode, amount, reason }) {
     if (response.status && response.data) {
       return response.data;
     } else {
-      throw new Error(
+      throw new new Error(
         response.message || "Failed to initiate Paystack transfer."
       );
     }
   } catch (error) {
     console.error("Paystack Transfer Initiation Error:", error);
-    throw new Error(`Paystack Transfer Failed: ${error.message}`);
+    throw new new Error(`Paystack Transfer Failed: ${error.message}`);
   }
 }
 
 router.post("/", async (req, res) => {
-  // --- Initial Validation and Deduct Balance ---
+  // -------------------------------------------------------------
+  // 💡 FIX APPLIED: Renamed 'amount' to 'coinAmount' and destructured 'conversionRate'
+  // -------------------------------------------------------------
   const {
     userId,
-    amount,
+    amount: coinAmount, // The amount in coins
     bankCode,
     bankName,
     accountNumber,
     accountName,
+    conversionRate, // The rate (e.g., 100) sent from the frontend
   } = req.body;
+  // -------------------------------------------------------------
 
+  // --- Initial Validation and Deduct Balance ---
   if (
     !userId ||
-    !amount ||
+    !coinAmount || // Use coinAmount for validation
     !bankCode ||
     !bankName ||
     !accountNumber ||
-    !accountName
+    !accountName ||
+    !conversionRate
   ) {
     return res
       .status(400)
       .json({ error: "All required fields must be provided" });
   }
-  if (amount <= 0) {
+  if (coinAmount <= 0) {
     return res.status(400).json({ error: "Invalid withdrawal amount" });
   }
 
-  // Use a transaction/lock mechanism here for better atomicity in a production app.
+  // Calculate the actual Naira amount to be paid out
+  const nairaAmountToTransfer = coinAmount * conversionRate;
+
   let user;
   try {
     user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (user.balance < amount) {
+    if (user.balance < coinAmount) {
+      // Check user balance against the coin amount
       return res.status(400).json({ error: "Insufficient balance" });
     }
 
-    // Deduct the balance immediately to reserve the funds
-    user.balance -= amount;
+    // Deduct the **coin amount** immediately to reserve the funds
+    user.balance -= coinAmount;
     await user.save();
   } catch (dbError) {
-    return res
-      .status(500)
-      .json({
-        error: "Database error during balance check/deduction",
-        details: dbError.message,
-      });
+    return res.status(500).json({
+      error: "Database error during balance check/deduction",
+      details: dbError.message,
+    });
   }
   // --- End Initial Validation and Deduct Balance ---
 
   // --- Paystack Automation ---
-  let transaction; // Declare outside try block for scope
+  let transaction;
   let paystackRecipient;
 
   try {
@@ -133,33 +144,34 @@ router.post("/", async (req, res) => {
       accountName,
       accountNumber,
       bankCode,
-      userName,
+      userName: user.userName, // Assuming user.userName exists
     });
 
     // 2. Initiate the Transfer
-    const reason = `Withdrawal payout to ${userName}`;
+    const reason = `Withdrawal payout to ${user.userName}`;
     const paystackTransfer = await initiatePaystackTransfer({
       recipientCode: paystackRecipient.recipient_code,
-      amount: amount,
+      // 💡 FIX APPLIED: Pass the calculated Naira amount
+      amount: nairaAmountToTransfer,
       reason: reason,
     });
 
-    // 3. Create a new withdrawal transaction (Status will reflect the immediate outcome)
-    // Paystack transfer status can be 'pending', 'success', or 'failed' immediately.
-    // For 'pending', you should rely on webhooks for the final status.
-    const transferStatus = paystackTransfer.status; // e.g., 'pending', 'success'
+    // 3. Create a new withdrawal transaction
+    const transferStatus = paystackTransfer.status;
 
     transaction = new Transaction({
       user: userId,
       type: "withdrawal",
-      amount,
-      status: transferStatus, // Use Paystack status
+      amount: coinAmount, // Store the withdrawn coin amount
+      status: transferStatus,
       details: {
-        userName,
+        userName: user.userName,
         bankCode,
         bankName,
         accountNumber,
         accountName,
+        conversionRate, // Store the rate used
+        nairaAmountSent: nairaAmountToTransfer, // Store the Naira value sent
         paystackRecipientCode: paystackRecipient.recipient_code,
         paystackTransferCode: paystackTransfer.transfer_code,
       },
@@ -172,25 +184,24 @@ router.post("/", async (req, res) => {
 
     res.status(200).json({
       status: "ok",
-      message: `Withdrawal initiated successfully. Status: ${transferStatus}.`,
+      message: `Withdrawal initiated successfully for ${nairaAmountToTransfer} NGN. Status: ${transferStatus}.`,
       transfer_code: paystackTransfer.transfer_code,
       newBalance: user.balance,
     });
   } catch (paystackError) {
     // --- ROLLBACK LOGIC ---
-    // If Paystack failed, the user should be credited back the amount deducted
     try {
-      user.balance += amount; // Roll back the balance deduction
+      // Roll back the coin amount deduction
+      user.balance += coinAmount;
       await user.save();
       console.warn(
-        `Balance rolled back for user ${userId} due to Paystack failure.`
+        `Balance rolled back for user ${userId} due to Paystack failure. Coins: ${coinAmount}`
       );
     } catch (rollbackError) {
       console.error(
         `CRITICAL: Failed to rollback balance for user ${userId}. Manual intervention required.`,
         rollbackError
       );
-      // Consider logging this failure to a dedicated error tracking system
     }
     // -----------------------
 
@@ -198,7 +209,7 @@ router.post("/", async (req, res) => {
     const failedTransaction = new Transaction({
       user: userId,
       type: "withdrawal",
-      amount,
+      amount: coinAmount,
       status: "failed",
       details: {
         ...req.body,
