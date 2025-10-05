@@ -13,7 +13,6 @@ const transactionSchema = new Schema(
     amount: { 
       type: Number,
       required: true,
-      min: 0.01 // Ensures a positive amount
     },
     status: {
       type: String,

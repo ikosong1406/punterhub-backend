@@ -1,83 +1,85 @@
 import express from "express";
+import mongoose from "mongoose";
 import User from "../models/user.schema.js";
 import Signal from "../models/signal.schema.js";
-import mongoose from "mongoose";
 
 const router = express.Router();
+
+// Helper: what tipTypes are allowed by plan
+const getAllowedTipTypes = (plan) => {
+  if (!plan) return [];
+  const lower = plan.toLowerCase();
+  if (lower === "silver") return ["silver"];
+  if (lower === "gold") return ["silver", "gold"];
+  if (lower === "diamond") return ["silver", "gold", "diamond"];
+  return [];
+};
 
 router.post("/", async (req, res) => {
   try {
     const { userId } = req.body;
+    if (!userId) return res.status(400).json({ error: "UserId is required" });
 
-    if (!userId) {
-      return res.status(400).json({ error: "UserId is required" });
-    }
+    // 1. Get user with subscribed punters
+    const user = await User.findById(userId).select("subscribedPunters");
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Get the user and their subscribed punters, and also populate the punter details
-    let user = await User.findById(userId).select("subscribedPunters");
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    if (!user.subscribedPunters || user.subscribedPunters.length === 0) {
+    if (!user.subscribedPunters?.length)
       return res.status(200).json({ status: "ok", data: [] });
-    }
 
     const now = new Date();
-    const validSubscriptions = [];
-    const subscriptionsToDelete = [];
+    const validPunterIds = [];
+    const planMap = new Map();
 
-    // Filter out expired subscriptions and build a map of valid punter IDs and their data
-    const punterMap = new Map();
-    user.subscribedPunters.forEach(subscription => {
-      const subscriptionDate = new Date(subscription.subscriptionDate);
-      const expiryDate = new Date(subscriptionDate.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days in milliseconds
-
-      if (now <= expiryDate) {
-        validSubscriptions.push(subscription.punterId);
-      } else {
-        subscriptionsToDelete.push(subscription.punterId);
+    // 2. Filter out expired subscriptions
+    user.subscribedPunters.forEach((sub) => {
+      if (!sub.punterId) return;
+      const expiry = new Date(sub.subscriptionDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      if (now <= expiry) {
+        validPunterIds.push(sub.punterId);
+        planMap.set(sub.punterId.toString(), sub.plan);
       }
     });
 
-    // If there are expired subscriptions, remove them
-    if (subscriptionsToDelete.length > 0) {
-      user.subscribedPunters = user.subscribedPunters.filter(
-        subscription => !subscriptionsToDelete.includes(subscription.punterId)
-      );
-      await user.save();
-    }
+    // 3. Get punters and populate their signals
+    const punters = await User.find({ _id: { $in: validPunterIds } })
+      .select("_id username signals")
+      .populate({
+        path: "signals",
+        model: Signal,
+        select: "tipType description createdAt", // select the fields you want
+      });
 
-    // If no valid subscriptions are left after filtering, return an empty array
-    if (validSubscriptions.length === 0) {
-      return res.status(200).json({ status: "ok", data: [] });
-    }
+    // 4. Filter and collect signals
+    const allSignals = [];
 
-    // Get signals from all valid subscribed punters, populating the signals
-    const punters = await User.find({ _id: { $in: validSubscriptions } })
-      .select("username signals")
-      .populate("signals");
+    punters.forEach((punter) => {
+      const plan = planMap.get(punter._id.toString());
+      const allowed = getAllowedTipTypes(plan);
 
-    // Collect all signals into a single array and add punter details
-    const allSignals = punters.flatMap(punter =>
-      punter.signals.map(signal => ({
-        ...signal.toObject(),
-        punterId: punter._id,
-        punterUsername: punter.username,
-      }))
-    );
-    
-    // Sort signals by newest first
-    allSignals.sort((a, b) => b.createdAt - a.createdAt);
+      punter.signals.forEach((sig) => {
+        if (allowed.includes(sig.tipType?.toLowerCase())) {
+          allSignals.push({
+            ...sig.toObject(),
+            punterId: punter._id,
+            punterUsername: punter.username,
+            subscribedPlan: plan,
+          });
+        }
+      });
+    });
+
+    // 5. Sort by newest first
+    allSignals.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     res.status(200).json({
       status: "ok",
       count: allSignals.length,
       data: allSignals,
     });
-  } catch (error) {
-    console.error("Error fetching signals:", error);
-    res.status(500).json({ error: "Server error", details: error.message });
+  } catch (err) {
+    console.error("Error fetching signals:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 });
 

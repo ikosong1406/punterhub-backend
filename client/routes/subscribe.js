@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
       user: userId,
       type: "subscription",
       amount: -price, // Negative amount to represent a debit
-      status: "completed",
+      status: "success",
       description: `Subscription to ${punter.username} (${plan} plan)`,
     });
     
@@ -74,7 +74,7 @@ router.post("/", async (req, res) => {
       user: punterId,
       type: "payment",
       amount: punterEarnings,
-      status: "completed",
+      status: "success",
       description: `Earnings from new subscriber: ${user.username}`,
     });
 

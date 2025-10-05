@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
     const { id, status } = req.body;
 
     // Define the valid statuses based on your schema enum
-    const allowedStatuses = ["pending", "completed", "failed"];
+    const allowedStatuses = ["pending", "success", "failed"];
     
     // Validate the provided status
     if (!allowedStatuses.includes(status)) {
