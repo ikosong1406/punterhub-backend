@@ -4,7 +4,7 @@ const { Schema, model } = mongoose;
 
 // --- Sub-schema for individual matches within a betting signal ---
 const matchSchema = new Schema({
-  team: { type: String },
+  teams: { type: String },
   prediction: { type: String },
 });
 
@@ -65,6 +65,11 @@ const signalSchema = new Schema(
 
     // --- Added Field for Comments ---
     comments: [commentSchema], // Array of user comments
+    punterId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true, // Adds 'createdAt' and 'updatedAt' to the Signal document

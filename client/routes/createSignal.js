@@ -56,7 +56,7 @@ router.post("/", async (req, res) => {
       timeFrame,
       status,
       // Add the punter's user ID to the signal document itself (recommended practice)
-      punter: user._id 
+      punterId: user._id 
     });
 
     // 4. Save the new signal to the Signal collection
