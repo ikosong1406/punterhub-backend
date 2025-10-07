@@ -14,10 +14,13 @@ app.use(express.json());
 // 💡 FIX APPLIED: Custom CORS Configuration
 // ------------------------------------------------------------------
 const allowedOrigins = [
-  "http://localhost:5173", // 👈 Allow your local frontend
-  "https://punterhub-backend.onrender.com", // 👈 Allow requests from your own render domain (optional, but good practice)
-  // Add your production frontend domain here when you deploy it
+  "http://localhost:5173",
+  "https://punterhub-backend.onrender.com", 
   "https://app.thepunterhub.com",
+  "https://api.thepunterhub.com",
+  "https://admin.thepunterhub.com",
+  "https://thepunterhub.vercel.app",
+  "https://punterhub-admin.vercel.app"
 ];
 
 const corsOptions = {

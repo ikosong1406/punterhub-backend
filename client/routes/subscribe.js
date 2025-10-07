@@ -75,13 +75,13 @@ router.post("/", async (req, res) => {
       type: "payment",
       amount: punterEarnings,
       status: "success",
-      description: `Earnings from new subscriber: ${user.username}`,
+      description: `Earnings from new subscriber`,
     });
 
     // Create a notification for the punter
     const notification = await Notification.create({
       title: "New Subscriber",
-      description: `${user.username} has subscribed to your signals.`,
+      description: `Earnings from new subscriber`,
       type: "success",
       amount: punterEarnings,
     });
