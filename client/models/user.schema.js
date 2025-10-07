@@ -31,6 +31,18 @@ const userSchema = new Schema(
     promoCode: { type: String },
     signals: [{ type: Schema.Types.ObjectId, ref: "Signal" }],
     subscribers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    dailyPosted: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tip",
+      },
+    ],
+    dailyBought: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tip",
+      },
+    ],
     isVerified: { type: Boolean, default: false },
     isEmailVerified: { type: Boolean, default: false },
     balance: { type: Number, default: 0 },

@@ -38,6 +38,12 @@ import upload from "./routes/upload.js"
 import resolve from "./routes/resolve.js"
 import getTip from "./routes/getTip.js"
 import comment from "./routes/comment.js"
+import createTip from "./routes/createTip.js"
+import getDaily from "./routes/getDaily.js"
+import getPuntertip from "./routes/getPuntertip.js"
+import redeemTip from "./routes/redeemTip.js"
+import getBoughttip from "./routes/getBoughttip.js"
+import buyTip from "./routes/buyTip.js"
 
 const router = Router();
 
@@ -80,5 +86,11 @@ router.use("/upload", upload)
 router.use("/resolve", resolve)
 router.use("/getTip", getTip)
 router.use("/comment", comment)
+router.use("/createTip", createTip)
+router.use("/getDaily", getDaily)
+router.use("/getPuntertip", getPuntertip)
+router.use("/redeemTip", redeemTip)
+router.use("/getBoughttip", getBoughttip)
+router.use("/buyTip", buyTip)
 
 export default router;
