@@ -83,9 +83,7 @@ router.post('/', async (req, res) => {
         // --- 4. COMMIT TRANSACTION and Send Response ---
         await session.commitTransaction();
         res.status(200).json({ 
-            message: 'Tip purchase successful! Details have been added to your account.',
-            newBalance: user.balance,
-            tipSalesCount: tip.sales
+            message: 'Tip purchase successful! please check My Tip Page.',
         });
 
     } catch (error) {

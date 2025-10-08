@@ -6,7 +6,7 @@ const router = Router();
 
 // --- GET /api/tips/bought/:userId ---
 // This route is for fetching all tips a user has purchased.
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
     // 1. Get the userId from the request body
     const { userId } = req.body;
 
