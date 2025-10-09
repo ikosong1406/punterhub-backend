@@ -7,7 +7,7 @@ const transactionSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     type: {
       type: String,
-      enum: ["deposit", "withdrawal", "subscription", "payment"],
+      enum: ["deposit", "withdrawal", "subscription", "payment","redeemed"],
       required: true,
     },
     amount: { 

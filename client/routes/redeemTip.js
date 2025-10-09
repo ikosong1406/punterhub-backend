@@ -90,7 +90,7 @@ router.post("/", async (req, res) => {
         [
           {
             user: punterId,
-            type: "payment",
+            type: "redeemed",
             amount: punterCreditAmount,
             status: "success",
             description: `Earnings from daily redemption`,
