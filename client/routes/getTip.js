@@ -1,39 +1,19 @@
-import express from "express";
-import Signal from "../models/signal.schema.js"; // Import the Signal model
+// routes/user.routes.js
+import { Router } from "express";
+import Tip from "../../client/models/tip.schema.js";
 
-const router = express.Router();
+const router = Router();
 
-router.post("/", async (req, res) => {
+// Route to get all user details
+router.get("/", async (req, res) => {
   try {
-    // 1. Get the tip ID from the request body
-    const { tipId } = req.body; 
-
-    if (!tipId) {
-      return res.status(400).json({ status: "error", message: "Tip ID is required" });
-    }
-
-    // 2. Find the signal/tip by its ID. 
-    const tip = await Signal.findById(tipId);
-
-    if (!tip) {
-      return res.status(404).json({ status: "error", message: "Tip not found" });
-    }
-
-    // 3. Return the complete tip document.
-    res.status(200).json({
-      status: "ok",
-      data: {
-        tip: tip,
-      },
-    });
-
+    const tips = await Tip.find({});
+    res.json({ success: true, data: tips });
   } catch (error) {
-    // Handle specific error for invalid MongoDB ID format
-    if (error.kind === 'ObjectId') {
-        return res.status(400).json({ status: "error", message: "Invalid Tip ID format" });
-    }
-    // Handle other server errors
-    res.status(500).json({ status: "error", message: "Server error", details: error.message });
+    console.error("Error fetching tips:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch tip data" });
   }
 });
 

@@ -1,90 +1,51 @@
-import { Router } from 'express';
-import Tip from '../models/tip.schema.js'; // Adjust path as needed
-import User from '../models/user.schema.js'; // Adjust path as needed
+import express from "express";
+import Tip from "../models/tip.schema.js"; // Adjust path if needed
 
-const router = Router();
+const router = express.Router();
 
-router.post('/', async (req, res) => {
-    // Destructure punterId first, as it's key to the initial check
+router.post("/", async (req, res) => {
+  try {
     const {
-        punterId, 
-        punterName, 
-        description, 
-        price, 
-        primaryCategory, 
-        secondaryCategory, 
-        bookingCode, 
-        assets 
+      primaryCategory,
+      bettingSite,
+      bettingCode,
+      startTime,
+      totalOdd,
+      confidenceLevel,
+      matches,
+      status
     } = req.body;
 
-    // Basic validation to ensure punterId is present
-    if (!punterId) {
-        return res.status(400).json({ message: 'A valid punterId is required.' });
+    // 1. Validate required fields, including userId
+    if (!primaryCategory) {
+      return res.status(400).json({ error: "primary category are required" });
     }
 
-    try {
-        // --- 1. CHECK FOR USER EXISTENCE ---
-        const user = await User.findById(punterId).select('_id dailyPosted');
+    // 3. Create the signal
+    const newTip = new Tip({
+      primaryCategory,
+      bettingSite,
+      bettingCode,
+      startTime,
+      totalOdd,
+      confidenceLevel,
+      matches,
+      status,
+    });
 
-        if (!user) {
-            // If the user is NOT found, stop here and return an error.
-            return res.status(404).json({ 
-                message: `User with ID ${punterId} not found. Tip creation aborted.`
-            });
-        }
-        
-        // --- 2. CALCULATE EXPIRY TIME (24 hours from creation) ---
-        // Get the current time
-        const now = new Date();
-        // Calculate expiry time (current time + 24 hours in milliseconds)
-        const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
-        const expiryTime = new Date(now.getTime() + ONE_DAY_IN_MS);
+    // 4. Save the new signal to the Signal collection
+    await newTip.save();
 
-
-        // --- 3. Create the new Tip (ONLY if user is found) ---
-          const newTip = new Tip({
-              punterId,
-              punterName,
-              description,
-              price,
-              primaryCategory,
-              secondaryCategory,
-              // Use the calculated expiry time
-              expiryTime, 
-              bookingCode,
-              assets,
-          });
-
-        // Save the new tip to the database
-        const savedTip = await newTip.save();
-
-        // --- 4. Update User's dailyPosted Array ---
-        user.dailyPosted.push(savedTip._id);
-        const updatedUser = await user.save();
-        
-        // --- 5. Success Response ---
-        res.status(201).json({ 
-            message: 'Tip created and linked to user successfully!', 
-            tipId: savedTip._id, // Optionally return the new tip ID
-        });
-
-    } catch (error) {
-        // Handle Mongoose validation errors or database connection errors
-        console.error('Error creating tip or linking user:', error);
-        
-        // Check for common Mongoose validation errors
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ 
-                message: 'Validation failed for Tip creation.', 
-                errors: error.errors 
-            });
-        }
-        
-        res.status(500).json({ 
-            message: 'Server error during transaction.', 
-            error: error.message 
-        });
-    }
+    res.status(201).json({
+      status: "ok",
+      message: "Tip created",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Server error",
+      details: error.message
+    });
+  }
 });
 
 export default router;

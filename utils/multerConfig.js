@@ -6,7 +6,7 @@ import cloudinary from "./cloudinaryConfig.js"; // Adjust this if your config fi
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "sharperly", // Change folder name as needed
+    folder: "sPORT", // Change folder name as needed
     allowed_formats: ["jpeg", "jpg", "png"],
   },
 });

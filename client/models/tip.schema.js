@@ -2,90 +2,37 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-// Schema for an individual booking code
-const BookingCodeSchema = new Schema({
-    bookingSite: {
-        type: String,
-    },
-    code: {
-        type: String,
-    },
-    odd: {
-        type: Number,
-    }
-}, { _id: false }); // Set _id to false if you don't need IDs for subdocuments
-
-// Schema for an individual asset
-const AssetSchema = new Schema({
-    pair: {
-        type: String,
-    },
-    direction: { // e.g., 'buy', 'sell'
-        type: String,
-        enum: ['buy', 'sell', 'long', 'short'], // Example enum for clarity
-    },
-    enteryPrice: {
-        type: Number,
-    },
-    takeProfit: {
-        type: Number
-        // Not required in case it's a manual close
-    },
-    stopLoss: {
-        type: Number
-        // Not required in case it's a manual close
-    },
-    timeFrame: { // e.g., 'H4', 'D1', 'M15'
-        type: String
-    }
-}, { _id: false }); // Set _id to false if you don't need IDs for subdocuments
-
-// Main Tip Schema
-const TipSchema = new Schema({
-    punterName: {
-        type: String,
-        trim: true
-    },
-    punterId: {
-        type: mongoose.Schema.Types.ObjectId, // Assuming punterId links to a User/Punter collection
-        ref: 'User',
-    },
-    description: {
-        type: String,
-    },
-    price: {
-        type: Number,
-    },
-    primaryCategory: {
-        type: String,
-        trim: true
-    },
-    secondaryCategory: {
-        type: String,
-        trim: true
-    },
-    status: {
-        type: String,
-        enum: ['active', 'closed', 'redeemed'], // Allowed status values
-        default: 'active'
-    },
-    sales: {
-        type: Number,
-        default: 0,
-    },
-    expiryTime: {
-        type: Date,
-    },
-    bookingCode: {
-        type: [BookingCodeSchema], // Array of BookingCodeSchema objects
-        default: []
-    },
-    assets: {
-        type: [AssetSchema], // Array of AssetSchema objects
-        default: []
-    }
-}, {
-    timestamps: true // Adds createdAt and updatedAt fields
+// --- Sub-schema for individual matches within a betting signal ---
+const matchSchema = new Schema({
+  teams: { type: String },
+  prediction: { type: String },
 });
 
-export default model('Tip', TipSchema);
+// --- Main schema for a betting signal or tip ---
+const tipSchema = new Schema(
+  {
+    // General Signal/Tip Fields
+    primaryCategory: { type: String },
+
+    // Sports Betting Fields
+    bettingSite: { type: String },
+    bettingCode: { type: String },
+    matches: [matchSchema], // Array of individual matches
+
+    // Common Fields
+    startTime: { type: Date }, // Match or signal start time
+    totalOdd: { type: Number },
+    confidenceLevel: { type: Number, min: 0, max: 100 }, // % confidence
+    status: {
+      type: String,
+      enum: ["active", "win", "loss"],
+      default: "active",
+    },
+  },
+  {
+    timestamps: true, // Adds 'createdAt' and 'updatedAt' to the Signal document
+  }
+);
+
+
+export default model("Tip", tipSchema);
