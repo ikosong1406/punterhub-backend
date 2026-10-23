@@ -15,6 +15,7 @@ import getNotification from "./routes/getNotification.js";
 
 const router = Router();
 
+// update
 router.use("/login", login);
 router.use("/register", register);
 router.use("/reset", reset);
