@@ -6,8 +6,12 @@ import cors from "cors";
 import http from "http";
 import client from "./client/index.js";
 import admin from "./admin/index.js";
+import stripeWebhookRoutes from "./client/stripeWebhook.js";
 
 const app = express();
+
+app.use("/stripe/webhook", stripeWebhookRoutes);
+
 app.use(express.json());
 
 // ------------------------------------------------------------------
