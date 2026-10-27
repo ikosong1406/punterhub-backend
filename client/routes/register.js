@@ -53,17 +53,10 @@ router.post("/", async (req, res) => {
           .status(409)
           .json({ message: "An account with this email already exists." });
       }
-      if (
-        existingUser.phonenumber === phoneNumber &&
-        existingUser.phoneCode === phoneCode
-      ) {
-        return res.status(409).json({
-          message: "An account with this phone number already exists.",
-        });
-      }
+
       // Fallback for general conflict
       return res.status(409).json({
-        message: "An account with this email or phone number already exists.",
+        message: "An account with this email already exists.",
       });
     }
 
@@ -100,14 +93,14 @@ router.post("/", async (req, res) => {
     }
 
     // Send welcome email (optional, but good practice)
-    try {
-      const subject = "Welcome to The Punter Hub 🎉";
-      const html = welcomeTemplate(newUser.firstname, newUser.promoCode);
+    // try {
+    //   const subject = "Welcome to The TodayPrediction365 🎉";
+    //   const html = welcomeTemplate(newUser.firstname, newUser.promoCode);
 
-      await sendMail(newUser.email, subject, null, html);
-    } catch (emailErr) {
-      console.error("Error sending welcome email:", emailErr.message);
-    }
+    //   await sendMail(newUser.email, subject, null, html);
+    // } catch (emailErr) {
+    //   console.error("Error sending welcome email:", emailErr.message);
+    // }
 
     res.status(201).json({
       status: "ok",
