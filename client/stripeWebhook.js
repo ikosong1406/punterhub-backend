@@ -6,7 +6,7 @@ import User from "../client/models/user.schema.js";
 import Payment from "../client/models/payment.schema.js";
 
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_TEST_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_LIVE_SECRET_KEY);
 
 router.post(
   "/",

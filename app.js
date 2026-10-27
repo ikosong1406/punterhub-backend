@@ -20,9 +20,9 @@ app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5173",
   "https://punterhub-backend.onrender.com", 
-  "https://app.thepunterhub.com",
-  "https://api.thepunterhub.com",
-  "https://admin.thepunterhub.com",
+  "https://app.todayprediction365.com",
+  "https://api.todayprediction365.com",
+  "https://admin.todayprediction365.com",
   "https://thepunterhub.vercel.app",
   "https://punterhub-admin.vercel.app"
 ];
@@ -64,7 +64,7 @@ const server = http.createServer(app);
 
 // Routes
 app.get("/", (_req, res) => {
-  res.send("Welcome to PunterHub API");
+  res.send("Welcome to TodayPrediction365 API");
 });
 
 app.use("/client", client);
