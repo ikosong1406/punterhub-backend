@@ -102,7 +102,7 @@ export const reset = (resetCode) => {
       <!-- Content -->
       <div class="content">
         <p>
-          We received a request to reset your PunterHub password. Use the reset code below to create a new password.
+          We received a request to reset your Todayprediction365 password. Use the reset code below to create a new password.
         </p>
         
         <div class="code-box">${resetCode}</div>
@@ -116,13 +116,13 @@ export const reset = (resetCode) => {
         </p>
         
         <p class="warning">
-          For your security, never share this code with anyone. PunterHub staff will never ask for this code.
+          For your security, never share this code with anyone. Todayprediction365 staff will never ask for this code.
         </p>
       </div>
 
       <!-- Footer -->
       <div class="footer">
-        &copy; ${year} PunterHub. All rights reserved.
+        &copy; ${year} Todayprediction365. All rights reserved.
       </div>
     </div>
   </body>

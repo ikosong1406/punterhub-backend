@@ -92,7 +92,6 @@ router.post("/", async (req, res) => {
       }
     }
 
-    // Send welcome email (optional, but good practice)
     // try {
     //   const subject = "Welcome to The TodayPrediction365 🎉";
     //   const html = welcomeTemplate(newUser.firstname, newUser.promoCode);

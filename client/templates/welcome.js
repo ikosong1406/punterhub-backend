@@ -75,14 +75,14 @@ export const welcomeTemplate = (firstname, promoCode) => {
       
       <!-- Header -->
       <div class="header">
-        <h1>Welcome to PunterHub</h1>
+        <h1>Welcome to TodayPrediction365</h1>
       </div>
 
       <!-- Content -->
       <div class="content">
         <p>Hi <span class="highlight">${firstname}</span>,</p>
         <p>
-          We’re excited to have you join our community of passionate punters and sports lovers. 
+          We’re excited to have you join our community of passionate sports lovers. 
           Your account has been created successfully, and your journey starts now!
         </p>
         <p>
@@ -92,7 +92,7 @@ export const welcomeTemplate = (firstname, promoCode) => {
         <p>
           Click below to log in and start exploring.
         </p>
-        <a href="https://your-dashboard-url.com" class="button">Go to Dashboard</a>
+        <a href="https://app.todayprediction365.com" class="button">Go to Dashboard</a>
         <p style="margin-top: 30px;">
           Need help? Just reply to this email — we’re here for you.
         </p>
@@ -100,7 +100,7 @@ export const welcomeTemplate = (firstname, promoCode) => {
 
       <!-- Footer -->
       <div class="footer">
-        &copy; ${year} PunterHub. All rights reserved.
+        &copy; ${year} TodayPrediction365. All rights reserved.
       </div>
     </div>
   </body>
